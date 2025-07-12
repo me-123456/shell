@@ -1,0 +1,9 @@
+cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+
+vi /etc/chrony.conf
+
+server time.google.com iburst
+
+systemctl restart chronyd
+
+chronyc sources -v
