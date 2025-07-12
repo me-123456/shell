@@ -1,0 +1,31 @@
+#!/bin/bash
+
+set -e
+
+echo "安装EPEL仓库..."
+sudo dnf install -y epel-release
+
+echo "安装fail2ban..."
+sudo dnf install -y fail2ban
+
+echo "备份原始配置文件..."
+sudo cp /etc/fail2ban/jail.conf /etc/fail2ban/jail.local
+
+echo "写入SSH防护配置..."
+sudo tee /etc/fail2ban/jail.local > /dev/null <<EOF
+[sshd]
+enabled = true
+port = ssh
+filter = sshd
+logpath = /var/log/secure
+maxretry = 5
+bantime = 600
+findtime = 600
+EOF
+
+echo "启动并设置fail2ban开机自启..."
+sudo systemctl enable --now fail2ban
+
+echo "安装和配置完成，fail2ban服务状态："
+sudo systemctl status fail2ban
+sudo fail2ban-client status sshd
